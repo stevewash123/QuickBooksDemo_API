@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "BRdj+SpKNBBzeUlJZ5Vzc20UQdvS/ZdrObNlQ2gTHFM=",
+  "Source": "QuickBooksDemo.Api",
+  "BasePath": "_content/QuickBooksDemo.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
