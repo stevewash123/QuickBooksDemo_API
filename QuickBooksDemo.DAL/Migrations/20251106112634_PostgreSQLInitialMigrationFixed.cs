@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace QuickBooksDemo.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class AddQuickBooksSyncFields : Migration
+    public partial class PostgreSQLInitialMigrationFixed : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,15 +17,15 @@ namespace QuickBooksDemo.DAL.Migrations
                 name: "Customers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: false),
-                    Phone = table.Column<string>(type: "TEXT", nullable: false),
-                    Address = table.Column<string>(type: "TEXT", nullable: false),
-                    CustomerType = table.Column<string>(type: "TEXT", nullable: false),
-                    Notes = table.Column<string>(type: "TEXT", nullable: true),
-                    QuickBooksId = table.Column<string>(type: "TEXT", nullable: true),
-                    QuickBooksSyncDate = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Phone = table.Column<string>(type: "text", nullable: false),
+                    Address = table.Column<string>(type: "text", nullable: false),
+                    CustomerType = table.Column<string>(type: "text", nullable: false),
+                    Notes = table.Column<string>(type: "text", nullable: true),
+                    QuickBooksId = table.Column<string>(type: "text", nullable: true),
+                    QuickBooksSyncDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -36,12 +36,12 @@ namespace QuickBooksDemo.DAL.Migrations
                 name: "Technicians",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Phone = table.Column<string>(type: "TEXT", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: false),
-                    Specialties = table.Column<string>(type: "TEXT", nullable: false),
-                    Active = table.Column<bool>(type: "INTEGER", nullable: false)
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Phone = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Specialties = table.Column<string>(type: "text", nullable: false),
+                    Active = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -52,17 +52,17 @@ namespace QuickBooksDemo.DAL.Migrations
                 name: "Jobs",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "TEXT", nullable: false),
-                    CustomerId = table.Column<string>(type: "TEXT", nullable: false),
-                    Status = table.Column<string>(type: "TEXT", nullable: false),
-                    JobType = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    QuotedAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ActualAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    ScheduledDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    CompletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    AssignedTechnicianId = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    CustomerId = table.Column<string>(type: "text", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    JobType = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    QuotedAmount = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    ActualAmount = table.Column<decimal>(type: "numeric(18,2)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    ScheduledDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    CompletedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    AssignedTechnicianId = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -84,12 +84,12 @@ namespace QuickBooksDemo.DAL.Migrations
                 name: "LineItems",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    MaterialCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    LaborHours = table.Column<int>(type: "INTEGER", nullable: false),
-                    LaborCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    JobId = table.Column<string>(type: "TEXT", nullable: false)
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    MaterialCost = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    LaborHours = table.Column<int>(type: "integer", nullable: false),
+                    LaborCost = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    JobId = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {

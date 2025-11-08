@@ -20,6 +20,18 @@ public class QuickBooksDemoContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        // Configure all DateTime properties to use timestamp without time zone
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            foreach (var property in entityType.GetProperties())
+            {
+                if (property.ClrType == typeof(DateTime) || property.ClrType == typeof(DateTime?))
+                {
+                    property.SetColumnType("timestamp without time zone");
+                }
+            }
+        }
+
         // Customer configuration
         modelBuilder.Entity<Customer>(entity =>
         {
@@ -36,7 +48,11 @@ public class QuickBooksDemoContext : DbContext
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
                     v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null!) ?? new List<string>()
-                );
+                )
+                .Metadata.SetValueComparer(new Microsoft.EntityFrameworkCore.ChangeTracking.ValueComparer<List<string>>(
+                    (c1, c2) => c1!.SequenceEqual(c2!),
+                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                    c => c.ToList()));
             entity.HasMany(e => e.Jobs).WithOne(e => e.AssignedTechnician).HasForeignKey(e => e.AssignedTechnicianId);
         });
 

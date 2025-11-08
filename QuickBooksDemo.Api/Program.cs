@@ -33,8 +33,7 @@ builder.Services.AddCors(options =>
 
 // Configure Entity Framework
 builder.Services.AddDbContext<QuickBooksDemoContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") ??
-                     "Data Source=quickbooksdemo.db"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Configure QuickBooks settings
 builder.Services.Configure<QuickBooksConfig>(
@@ -65,11 +64,11 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Ensure database is created and seeded
+// Ensure database is migrated and seeded
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<QuickBooksDemoContext>();
-    context.Database.EnsureCreated();
+    context.Database.Migrate();
 }
 
 app.Run();
