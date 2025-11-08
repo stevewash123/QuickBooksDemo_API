@@ -31,9 +31,24 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Configure Entity Framework
+// Configure Entity Framework with DATABASE_URL support for Render deployment
+var connectionString = builder.Configuration["DATABASE_URL"];
+
+if (!string.IsNullOrEmpty(connectionString))
+{
+    // Convert PostgreSQL URI format to Npgsql connection string format for Render
+    connectionString = ConvertPostgresUriToConnectionString(connectionString);
+}
+else
+{
+    // Fall back to appsettings.json connection string (development)
+    connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+}
+
+Console.WriteLine($"Using PostgreSQL database connection: {!string.IsNullOrEmpty(connectionString)}");
+
 builder.Services.AddDbContext<QuickBooksDemoContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 
 // Configure QuickBooks settings
 builder.Services.Configure<QuickBooksConfig>(
@@ -72,3 +87,56 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+
+/// <summary>
+/// Converts PostgreSQL URI format to Npgsql connection string format
+/// Example: postgres://user:pass@host:port/db?sslmode=require
+/// Becomes: Host=host;Port=port;Database=db;Username=user;Password=pass;SSL Mode=Require;
+/// </summary>
+static string ConvertPostgresUriToConnectionString(string databaseUrl)
+{
+    try
+    {
+        var uri = new Uri(databaseUrl);
+        var userInfo = uri.UserInfo.Split(':');
+        var username = userInfo[0];
+        var password = userInfo.Length > 1 ? userInfo[1] : "";
+
+        var connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.LocalPath.TrimStart('/')};Username={username};Password={password};";
+
+        // Parse query parameters
+        if (!string.IsNullOrEmpty(uri.Query))
+        {
+            var queryParams = uri.Query.TrimStart('?').Split('&');
+            foreach (var param in queryParams)
+            {
+                var keyValue = param.Split('=');
+                if (keyValue.Length == 2)
+                {
+                    var key = keyValue[0].ToLower();
+                    var value = keyValue[1];
+
+                    if (key == "sslmode")
+                    {
+                        connectionString += $"SSL Mode={value.Replace("require", "Require")};";
+                    }
+                    else if (key == "channel_binding")
+                    {
+                        // Skip channel_binding as it's not supported by Npgsql connection string format
+                    }
+                    else
+                    {
+                        connectionString += $"{key}={value};";
+                    }
+                }
+            }
+        }
+
+        return connectionString;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error converting DATABASE_URL: {ex.Message}");
+        return databaseUrl; // Return original if conversion fails
+    }
+}
