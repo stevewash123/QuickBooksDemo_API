@@ -10,14 +10,16 @@ namespace QuickBooksDemo.Service.Services
     {
         private readonly QuickBooksConfig _config;
         private readonly HttpClient _httpClient;
+        private readonly IEmailService _emailService;
         private readonly object _lockObject = new object();
         private static string _cachedAccessToken = string.Empty;
         private static DateTime _cachedTokenExpiry = DateTime.MinValue;
 
-        public QuickBooksTokenService(IOptions<QuickBooksConfig> config, HttpClient httpClient)
+        public QuickBooksTokenService(IOptions<QuickBooksConfig> config, HttpClient httpClient, IEmailService emailService)
         {
             _config = config.Value;
             _httpClient = httpClient;
+            _emailService = emailService;
         }
 
         public async Task<string> GetValidAccessTokenAsync()
@@ -135,6 +137,23 @@ namespace QuickBooksDemo.Service.Services
             }
             catch (Exception ex)
             {
+                // Check if this is specifically a token refresh failure (invalid_grant error)
+                if (ex.Message.Contains("invalid_grant") || ex.Message.Contains("Incorrect or invalid refresh token"))
+                {
+                    // Send email notification for token refresh failures
+                    _ = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await _emailService.SendQuickBooksTokenErrorAsync(ex.Message, ex);
+                        }
+                        catch
+                        {
+                            // Don't let email failures prevent the main exception from being thrown
+                        }
+                    });
+                }
+
                 throw new Exception($"Failed to refresh access token: {ex.Message}", ex);
             }
         }

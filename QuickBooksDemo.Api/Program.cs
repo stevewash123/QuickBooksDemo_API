@@ -54,6 +54,10 @@ builder.Services.AddDbContext<QuickBooksDemoContext>(options =>
 builder.Services.Configure<QuickBooksConfig>(
     builder.Configuration.GetSection("QuickBooks"));
 
+// Configure Email settings
+builder.Services.Configure<EmailConfig>(
+    builder.Configuration.GetSection("Email"));
+
 // Register services
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ITechnicianService, TechnicianService>();
@@ -63,6 +67,7 @@ builder.Services.AddScoped<IQuickBooksApiService, QuickBooksApiService>();
 builder.Services.AddScoped<IQuickBooksTokenService, QuickBooksTokenService>();
 builder.Services.AddScoped<IQuickBooksIntegrationService, QuickBooksIntegrationService>();
 builder.Services.AddScoped<IReseedService, ReseedService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 
