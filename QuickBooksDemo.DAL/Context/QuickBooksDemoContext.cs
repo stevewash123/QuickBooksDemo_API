@@ -80,6 +80,7 @@ public class QuickBooksDemoContext : DbContext
             entity.HasOne(e => e.Job).WithMany(e => e.LineItems).HasForeignKey(e => e.JobId);
         });
 
+
         // Seed data
         SeedData(modelBuilder);
     }
